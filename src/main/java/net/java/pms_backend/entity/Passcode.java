@@ -18,7 +18,7 @@ public class Passcode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "passcode", nullable = false, length = 10)
+    @Column(name = "passcode", nullable = false)
     private String passcode;
 
     @Column(name = "is_active")
