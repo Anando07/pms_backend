@@ -21,7 +21,6 @@ public class PasscodeMapper {
                 .createdAt(passcode.getCreatedAt())
                 .updatedAt(passcode.getUpdatedAt())
                 .userId(user != null ? user.getId() : null)
-                .userName(user != null ? user.getName() : null)
                 .userEmail(user != null ? user.getEmail() : null)
                 .build();
     }
