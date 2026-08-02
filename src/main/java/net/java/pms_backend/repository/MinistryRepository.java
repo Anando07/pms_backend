@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface MinistryRepository extends JpaRepository<Ministry, Long> {
     Optional<Ministry> findByMinName(String name);
+
+    boolean existsByMinNameIgnoreCase(String minName);
 }
