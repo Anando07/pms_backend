@@ -28,4 +28,24 @@ public class MinistryController {
         List<MinistryDto> ministries = ministryService.getAllMinistries();
         return ResponseEntity.ok(ministries);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MinistryDto> getMinistryById(@PathVariable Long id) {
+        MinistryDto ministry = ministryService.getMinistryById(id);
+        return ResponseEntity.ok(ministry);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MinistryDto> updateMinistry(
+            @PathVariable Long id,
+            @RequestBody MinistryDto ministryDto) {
+        MinistryDto updatedMinistry = ministryService.updateMinistry(id, ministryDto);
+        return ResponseEntity.ok(updatedMinistry);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMinistry(@PathVariable Long id) {
+        ministryService.deleteMinistry(id);
+        return ResponseEntity.noContent().build();
+    }
 }

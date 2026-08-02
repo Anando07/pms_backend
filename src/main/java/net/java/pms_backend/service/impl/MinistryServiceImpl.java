@@ -3,6 +3,7 @@ package net.java.pms_backend.service.impl;
 import lombok.AllArgsConstructor;
 import net.java.pms_backend.dto.MinistryDto;
 import net.java.pms_backend.entity.Ministry;
+import net.java.pms_backend.exception.ResourceNotFoundException;
 import net.java.pms_backend.mapper.MinistryMapper;
 import net.java.pms_backend.repository.MinistryRepository;
 import net.java.pms_backend.service.MinistryService;
@@ -30,5 +31,30 @@ public class MinistryServiceImpl implements MinistryService {
         return ministries.stream()
                 .map(MinistryMapper::mapToMinistryDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public MinistryDto getMinistryById(Long id) {
+        Ministry ministry = ministryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ministry not found with id: " + id));
+        return MinistryMapper.mapToMinistryDto(ministry);
+    }
+
+    @Override
+    public MinistryDto updateMinistry(Long id, MinistryDto ministryDto) {
+        Ministry existingMinistry = ministryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ministry not found with id: " + id));
+
+        existingMinistry.setMinName(ministryDto.getMinName());
+
+        Ministry updatedMinistry = ministryRepository.save(existingMinistry);
+        return MinistryMapper.mapToMinistryDto(updatedMinistry);
+    }
+
+    @Override
+    public void deleteMinistry(Long id) {
+        Ministry existingMinistry = ministryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ministry not found with id: " + id));
+        ministryRepository.delete(existingMinistry);
     }
 }

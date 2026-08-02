@@ -156,9 +156,9 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         for (String ministryName : defaultMinistries) {
-            if (ministryRepository.findByName(ministryName).isEmpty()) {
+            if (ministryRepository.findByMinName(ministryName).isEmpty()) {
                 Ministry ministry = Ministry.builder()
-                        .name(ministryName)
+                        .minName(ministryName)
                         .build();
                 ministryRepository.save(ministry);
             }

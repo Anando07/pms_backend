@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class MinistryDto {
     private Long id;
-    private String name;
+    private String minName;
 }

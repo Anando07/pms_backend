@@ -16,6 +16,6 @@ public class Ministry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    @Column(name = "min_name", nullable = false, unique = true)
+    private String minName;
 }

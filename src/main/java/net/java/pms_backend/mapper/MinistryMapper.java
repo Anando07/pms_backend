@@ -11,7 +11,7 @@ public class MinistryMapper {
         if (ministry == null) return null;
         return MinistryDto.builder()
                 .id(ministry.getId())
-                .name(ministry.getName())
+                .minName(ministry.getMinName())
                 .build();
     }
 
@@ -19,7 +19,7 @@ public class MinistryMapper {
         if (ministryDto == null) return null;
         return Ministry.builder()
                 .id(ministryDto.getId())
-                .name(ministryDto.getName())
+                .minName(ministryDto.getMinName())
                 .build();
     }
 }
