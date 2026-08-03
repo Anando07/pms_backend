@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import net.java.pms_backend.dto.UserDto;
 import net.java.pms_backend.entity.Role;
 import net.java.pms_backend.entity.User;
+import net.java.pms_backend.entity.Ministry;
 import net.java.pms_backend.mapper.UserMapper;
 import net.java.pms_backend.repository.RoleRepository;
 import net.java.pms_backend.repository.UserRepository;
+import net.java.pms_backend.repository.MinistryRepository;
 import net.java.pms_backend.service.UserService;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final MinistryRepository ministryRepository;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -30,6 +33,7 @@ public class UserServiceImpl implements UserService {
         User user = UserMapper.mapToUser(userDto);
 
         user.setRole(resolveRole(userDto.getRoleId(), true));
+        user.setMinistry(resolveMinistry(userDto.getMinistryId(), false));
 
         User savedUser = userRepository.save(user);
         return UserMapper.mapToUserDto(savedUser);
@@ -60,13 +64,18 @@ public class UserServiceImpl implements UserService {
         user.setOfficeName(updatedUser.getOfficeName());
         user.setEmail(updatedUser.getEmail());
         user.setNumber(updatedUser.getNumber());
-        user.setMinDiv(updatedUser.getMinDiv());
 
         if (updatedUser.getActive() != null) {
             user.setActive(updatedUser.getActive());
         }
 
         user.setRole(resolveRole(updatedUser.getRoleId(), false));
+
+        // Only update ministry if the client explicitly provided a ministryId.
+        // This preserves the existing ministry when the field is omitted from the payload.
+        if (updatedUser.getMinistryId() != null) {
+            user.setMinistry(resolveMinistry(updatedUser.getMinistryId(), false));
+        }
 
         // Image is optional:
         // - avatar == null  -> field wasn't sent, leave the existing image untouched
@@ -110,6 +119,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Role not found with ID: " + roleId));
     }
 
+    private Ministry resolveMinistry(Long ministryId, boolean required) {
+        if (ministryId == null) {
+            if (required) {
+                throw new IllegalArgumentException("Ministry is required.");
+            }
+            return null;
+        }
+        return ministryRepository.findById(ministryId)
+                .orElseThrow(() -> new RuntimeException("Ministry not found with ID: " + ministryId));
+    }
+
     /**
      * Every field except the image (avatar) is required.
      * Enforced here so bad requests fail with a clear message instead of a
@@ -123,8 +143,11 @@ public class UserServiceImpl implements UserService {
         if (isBlank(dto.getOfficeName())) missing.add("officeName");
         if (isBlank(dto.getEmail())) missing.add("email");
         if (isBlank(dto.getNumber())) missing.add("number");
-        if (isBlank(dto.getMinDiv())) missing.add("minDiv");
-        if (dto.getRoleId() == null) missing.add("roleId");
+        if (dto.getRoleId() == null)
+            missing.add("roleId");
+
+        if (dto.getMinistryId() == null)
+            missing.add("ministryId");
 
         if (!missing.isEmpty()) {
             throw new IllegalArgumentException(

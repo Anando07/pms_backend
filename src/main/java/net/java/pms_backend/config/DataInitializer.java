@@ -227,11 +227,10 @@ public class DataInitializer implements CommandLineRunner {
             // 1. Build the User entity without password
             User adminUser = User.builder()
                     .name("System Administrator")
-                    .designation("Senior Systems Specialist")
-                    .officeName("IRD Central Office")
+                    .designation("Systems Developer")
+                    .officeName("Internal resources Division")
                     .email(adminEmail)
                     .number("01700000000")
-                    .minDiv("Internal Resources Division")
                     .active(true)
                     .role(superAdminRole)
                     .build();

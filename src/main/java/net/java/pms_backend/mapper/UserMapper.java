@@ -22,6 +22,9 @@ public class UserMapper {
             avatar = user.getProfileImages().get(0);
         }
 
+        Long ministryId = (user.getMinistry() != null) ? user.getMinistry().getId() : null;
+        String ministryName = (user.getMinistry() != null) ? user.getMinistry().getMinName() : null;
+
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -29,13 +32,14 @@ public class UserMapper {
                 .officeName(user.getOfficeName())
                 .email(user.getEmail())
                 .number(user.getNumber())
-                .minDiv(user.getMinDiv())
                 .active(user.getActive())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .roleId(roleId)
                 .roleName(roleName)
                 .avatar(avatar)
+                .ministryId(ministryId)
+                .ministryName(ministryName)
                 .build();
     }
 
@@ -54,7 +58,6 @@ public class UserMapper {
                 .officeName(userDto.getOfficeName())
                 .email(userDto.getEmail())
                 .number(userDto.getNumber())
-                .minDiv(userDto.getMinDiv())
                 .active(userDto.getActive() == null || userDto.getActive())
                 .createdAt(userDto.getCreatedAt())
                 .updatedAt(userDto.getUpdatedAt())

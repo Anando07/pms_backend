@@ -35,9 +35,6 @@ public class User {
     @Column(nullable = false)
     private String number;
 
-    @Column(nullable = false)
-    private String minDiv;
-
     @ManyToOne
     @JoinColumn(name="ministry_id")
     private Ministry ministry;

@@ -19,7 +19,6 @@ public class UserDto {
     private String officeName;
     private String email;
     private String number;
-    private String minDiv;
 
     private Boolean active;
     private LocalDateTime createdAt;
@@ -32,6 +31,10 @@ public class UserDto {
     // Role Details
     private Long roleId;
     private String roleName;
+
+    // Ministry Details
+    private Long ministryId;
+    private String ministryName;
 
     // Passcode intentionally removed -- not needed on the Users screen.
 }
