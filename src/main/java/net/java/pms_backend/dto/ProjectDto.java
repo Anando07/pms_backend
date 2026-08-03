@@ -19,26 +19,39 @@ public class ProjectDto {
     private Long id;
 
     @NotBlank(message = "Project name is required")
-    @Size(max = 255, message = "Project name must be at most 255 characters")
+    @Size(max = 500, message = "Project name must be at most 500 characters")
     private String projectName;
 
     @NotNull(message = "Ministry ID is required")
     @Positive(message = "Ministry ID must be a positive number")
     private Long ministryId;
 
+    // Directorate is optional, but if provided must be positive
     @Positive(message = "Directorate ID must be a positive number")
     private Long directorateId;
 
-    @NotNull(message = "Start date is required")
-    @PastOrPresent(message = "Start date cannot be in the future")
-    private LocalDate startDate;
+    @NotNull(message = "Approved start date is required")
+    private LocalDate approvedStartDate;
 
-    @NotNull(message = "End date is required")
-    private LocalDate endDate;
+    @NotNull(message = "Approved end date is required")
+    private LocalDate approvedEndDate;
 
-    @NotNull(message = "Total budget is required")
-    @DecimalMin(value = "0.01", message = "Total budget must be greater than 0")
-    private BigDecimal totalBudget;
+    @NotNull(message = "Approved budget is required")
+    @DecimalMin(value = "0.01", message = "Approved budget must be greater than 0")
+    private BigDecimal approvedBudget;
+
+    // --- REVISED FIELDS (ALL OPTIONAL) ---
+
+    // Removed @PastOrPresent so future revised dates work and optional nulls don't fail
+    private LocalDate revisedStartDate;
+
+    private LocalDate revisedEndDate;
+
+    // Optional: Only validates min value if a non-null budget is provided
+    @Positive(message = "Revised budget must be greater than 0")
+    private BigDecimal revisedBudget;
+
+    // --------------------------------------
 
     @NotNull(message = "Priority is required")
     private Project.Priority priority;

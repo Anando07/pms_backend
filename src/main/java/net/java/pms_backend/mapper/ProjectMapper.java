@@ -16,9 +16,12 @@ public class ProjectMapper {
                 .projectName(project.getProjectName())
                 .ministryId(project.getMinistry() != null ? project.getMinistry().getId() : null)
                 .directorateId(project.getDirectorate() != null ? project.getDirectorate().getId() : null)
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .totalBudget(project.getTotalBudget())
+                .approvedStartDate(project.getApprovedStartDate())
+                .approvedEndDate(project.getApprovedEndDate())
+                .approvedBudget(project.getApprovedBudget())
+                .revisedStartDate(project.getRevisedStartDate())
+                .revisedEndDate(project.getRevisedEndDate())
+                .revisedBudget(project.getRevisedBudget())
                 .priority(project.getPriority())
                 .status(project.getStatus())
                 .images(project.getImages())
@@ -33,9 +36,12 @@ public class ProjectMapper {
                 .projectName(projectDto.getProjectName())
                 .ministry(ministry)
                 .directorate(directorate)
-                .startDate(projectDto.getStartDate())
-                .endDate(projectDto.getEndDate())
-                .totalBudget(projectDto.getTotalBudget())
+                .approvedStartDate(projectDto.getApprovedStartDate())
+                .approvedEndDate(projectDto.getApprovedEndDate())
+                .approvedBudget(projectDto.getApprovedBudget())
+                .revisedStartDate(projectDto.getRevisedStartDate())
+                .revisedEndDate(projectDto.getRevisedEndDate())
+                .revisedBudget(projectDto.getRevisedBudget())
                 .priority(projectDto.getPriority())
                 .status(projectDto.getStatus())
                 .images(projectDto.getImages())
@@ -47,9 +53,20 @@ public class ProjectMapper {
         existing.setProjectName(projectDto.getProjectName());
         existing.setMinistry(ministry);
         existing.setDirectorate(directorate);
-        existing.setStartDate(projectDto.getStartDate());
-        existing.setEndDate(projectDto.getEndDate());
-        existing.setTotalBudget(projectDto.getTotalBudget());
+        existing.setApprovedStartDate(projectDto.getApprovedStartDate());
+        existing.setApprovedEndDate(projectDto.getApprovedEndDate());
+        existing.setApprovedBudget(projectDto.getApprovedBudget());
+        // Only update revised fields if explicitly provided in the DTO. This prevents
+        // accidental clearing of existing revised values when the client omits them.
+        if (projectDto.getRevisedStartDate() != null) {
+            existing.setRevisedStartDate(projectDto.getRevisedStartDate());
+        }
+        if (projectDto.getRevisedEndDate() != null) {
+            existing.setRevisedEndDate(projectDto.getRevisedEndDate());
+        }
+        if (projectDto.getRevisedBudget() != null) {
+            existing.setRevisedBudget(projectDto.getRevisedBudget());
+        }
         existing.setPriority(projectDto.getPriority());
         existing.setStatus(projectDto.getStatus());
         if (projectDto.getImages() != null) {

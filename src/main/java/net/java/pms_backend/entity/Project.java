@@ -22,7 +22,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "project_name", nullable = false, length = 255)
+    @Column(name = "project_name", nullable = false, length = 500)
     private String projectName;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,14 +33,24 @@ public class Project {
     @JoinColumn(name = "directorate_id", nullable = true)
     private Directorate directorate;
 
-    @Column(name = "start_date", nullable = false)
-    private LocalDate startDate;
+    @Column(name = "approved_start_date", nullable = false)
+    private LocalDate approvedStartDate;
 
-    @Column(name = "end_date", nullable = false)
-    private LocalDate endDate;
+    @Column(name = "approved_end_date", nullable = false)
+    private LocalDate approvedEndDate;
 
-    @Column(name = "total_budget", nullable = false, precision = 18, scale = 2)
-    private BigDecimal totalBudget;
+    @Column(name = "approved_budget", nullable = false, precision = 18, scale = 2)
+    private BigDecimal approvedBudget;
+
+    @Column(name = "revised_start_date", nullable = true)
+    private LocalDate revisedStartDate;
+
+    @Column(name = "revised_end_date", nullable = true)
+    private LocalDate revisedEndDate;
+
+
+    @Column(name = "revised_budget", nullable = true, precision = 18, scale = 2)
+    private BigDecimal revisedBudget;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -78,6 +88,6 @@ public class Project {
     }
 
     public enum Status {
-        APPROVED, UNAPPROVED, PROCESSING, DPP
+        APPROVED, UNAPPROVED
     }
 }

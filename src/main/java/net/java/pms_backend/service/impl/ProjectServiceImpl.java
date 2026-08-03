@@ -101,8 +101,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private void validateDateRange(ProjectDto projectDto) {
-        if (projectDto.getStartDate() != null && projectDto.getEndDate() != null
-                && projectDto.getEndDate().isBefore(projectDto.getStartDate())) {
+        if (projectDto.getApprovedStartDate() != null && projectDto.getApprovedEndDate() != null
+                && projectDto.getApprovedEndDate().isBefore(projectDto.getApprovedStartDate())) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
+        if (projectDto.getRevisedStartDate() != null && projectDto.getRevisedEndDate() != null
+                && projectDto.getRevisedEndDate().isBefore(projectDto.getRevisedStartDate())) {
             throw new IllegalArgumentException("End date must be after start date");
         }
     }
