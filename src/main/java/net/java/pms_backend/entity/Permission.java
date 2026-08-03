@@ -1,0 +1,24 @@
+package net.java.pms_backend.entity;
+
+public enum Permission {
+    USER_READ,
+    USER_CREATE,
+    USER_UPDATE,
+    USER_DELETE,
+
+    PROJECT_READ,
+    PROJECT_CREATE,
+    PROJECT_UPDATE,
+    PROJECT_DELETE,
+
+    MINISTRY_READ,
+    MINISTRY_CREATE,
+    MINISTRY_UPDATE,
+    MINISTRY_DELETE,
+
+    DIRECTORATE_READ,
+    DIRECTORATE_CREATE,
+    DIRECTORATE_UPDATE,
+    DIRECTORATE_DELETE
+}
+

@@ -38,6 +38,13 @@ public class RoleController {
         return ResponseEntity.ok(roles);
     }
 
+    // Build Update Role REST API
+    @PutMapping("{id}")
+    public ResponseEntity<RoleDto> updateRole(@PathVariable("id") Long roleId, @RequestBody RoleDto roleDto) {
+        RoleDto updated = roleService.updateRole(roleId, roleDto);
+        return ResponseEntity.ok(updated);
+    }
+
     // Build Delete Role REST API
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteRole(@PathVariable("id") Long roleId) {

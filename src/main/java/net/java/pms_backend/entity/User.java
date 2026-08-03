@@ -38,6 +38,10 @@ public class User {
     @Column(nullable = false)
     private String minDiv;
 
+    @ManyToOne
+    @JoinColumn(name="ministry_id")
+    private Ministry ministry;
+
     @Column(name = "is_active")
     private Boolean active = true;
 
