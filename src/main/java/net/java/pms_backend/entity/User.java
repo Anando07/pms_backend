@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -51,8 +53,16 @@ public class User {
     private Role role;
 
     // Relationship with Passcode (One User -> One Passcode)
+    // Kept on the entity, but intentionally not exposed through UserDto/UserMapper --
+    // passcode is not needed on the Users screen.
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Passcode passcode;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "profile_images", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "image_data", columnDefinition = "LONGTEXT")
+    @Builder.Default
+    private List<String> profileImages = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

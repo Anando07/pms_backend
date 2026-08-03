@@ -10,6 +10,7 @@ import net.java.pms_backend.repository.UserRepository;
 import net.java.pms_backend.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,14 +23,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
+        validateRequiredFields(userDto);
+
+        // UserMapper.mapToUser copies userDto.getAvatar() into user.profileImages,
+        // so the image is persisted on create instead of being silently dropped.
         User user = UserMapper.mapToUser(userDto);
 
-        // Fetch managed Role entity from DB if roleId is provided
-        if (userDto.getRoleId() != null) {
-            Role role = roleRepository.findById(userDto.getRoleId())
-                    .orElseThrow(() -> new RuntimeException("Role not found with ID: " + userDto.getRoleId()));
-            user.setRole(role);
-        }
+        user.setRole(resolveRole(userDto.getRoleId(), true));
 
         User savedUser = userRepository.save(user);
         return UserMapper.mapToUserDto(savedUser);
@@ -37,8 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        User user = findUserOrThrow(userId);
         return UserMapper.mapToUserDto(user);
     }
 
@@ -52,8 +51,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(Long userId, UserDto updatedUser) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        validateRequiredFields(updatedUser);
+
+        User user = findUserOrThrow(userId);
 
         user.setName(updatedUser.getName());
         user.setDesignation(updatedUser.getDesignation());
@@ -66,10 +66,18 @@ public class UserServiceImpl implements UserService {
             user.setActive(updatedUser.getActive());
         }
 
-        if (updatedUser.getRoleId() != null) {
-            Role role = roleRepository.findById(updatedUser.getRoleId())
-                    .orElseThrow(() -> new RuntimeException("Role not found with ID: " + updatedUser.getRoleId()));
-            user.setRole(role);
+        user.setRole(resolveRole(updatedUser.getRoleId(), false));
+
+        // Image is optional:
+        // - avatar == null  -> field wasn't sent, leave the existing image untouched
+        // - avatar == ""    -> user explicitly removed the image
+        // - avatar == "..." -> new image, replaces the existing one
+        if (updatedUser.getAvatar() != null) {
+            List<String> imgs = new ArrayList<>();
+            if (!updatedUser.getAvatar().isBlank()) {
+                imgs.add(updatedUser.getAvatar());
+            }
+            user.setProfileImages(imgs);
         }
 
         User updatedUserObj = userRepository.save(user);
@@ -78,8 +86,53 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        // findUserOrThrow ensures a clean 404-style error instead of a silent no-op
+        // if the ID doesn't exist.
+        findUserOrThrow(userId);
         userRepository.deleteById(userId);
+    }
+
+    // ---- helpers ----
+
+    private User findUserOrThrow(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+    }
+
+    private Role resolveRole(Long roleId, boolean required) {
+        if (roleId == null) {
+            if (required) {
+                throw new IllegalArgumentException("Role is required.");
+            }
+            return null;
+        }
+        return roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found with ID: " + roleId));
+    }
+
+    /**
+     * Every field except the image (avatar) is required.
+     * Enforced here so bad requests fail with a clear message instead of a
+     * raw DataIntegrityViolationException from the DB's NOT NULL constraints.
+     */
+    private void validateRequiredFields(UserDto dto) {
+        List<String> missing = new ArrayList<>();
+
+        if (isBlank(dto.getName())) missing.add("name");
+        if (isBlank(dto.getDesignation())) missing.add("designation");
+        if (isBlank(dto.getOfficeName())) missing.add("officeName");
+        if (isBlank(dto.getEmail())) missing.add("email");
+        if (isBlank(dto.getNumber())) missing.add("number");
+        if (isBlank(dto.getMinDiv())) missing.add("minDiv");
+        if (dto.getRoleId() == null) missing.add("roleId");
+
+        if (!missing.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Missing required field(s): " + String.join(", ", missing));
+        }
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

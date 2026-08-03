@@ -12,22 +12,26 @@ import java.time.LocalDateTime;
 public class UserDto {
 
     private Long id;
+
+    // Required fields
     private String name;
     private String designation;
     private String officeName;
     private String email;
     private String number;
     private String minDiv;
+
     private Boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Profile image (single, optional). Named "avatar" to match the JSON key
+    // Users.jsx sends (formData.avatar) and reads (user.avatar).
+    private String avatar;
 
     // Role Details
     private Long roleId;
     private String roleName;
 
-    // Passcode Details (Optional/Flattened)
-    private String passcode;
-    private Boolean passcodeActive;
-    private LocalDateTime passcodeExpiresAt;
+    // Passcode intentionally removed -- not needed on the Users screen.
 }
