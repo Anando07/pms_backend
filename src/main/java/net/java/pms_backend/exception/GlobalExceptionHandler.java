@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message("Validation failed")
+                .message("Validation failed!")
                 .errors(errors)
                 .build();
 
