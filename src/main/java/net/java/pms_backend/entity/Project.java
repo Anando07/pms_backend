@@ -90,4 +90,12 @@ public class Project {
     public enum Status {
         APPROVED, UNAPPROVED
     }
+
+    // Add inside net.java.pms_backend.entity.Project
+    public BigDecimal getEffectiveBudget() {
+        if (this.revisedBudget != null && this.revisedBudget.compareTo(BigDecimal.ZERO) > 0) {
+            return this.revisedBudget;
+        }
+        return this.approvedBudget != null ? this.approvedBudget : BigDecimal.ZERO;
+    }
 }

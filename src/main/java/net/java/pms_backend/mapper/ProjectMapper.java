@@ -5,6 +5,8 @@ import net.java.pms_backend.entity.Directorate;
 import net.java.pms_backend.entity.Ministry;
 import net.java.pms_backend.entity.Project;
 
+import java.math.BigDecimal;
+
 public class ProjectMapper {
 
     private ProjectMapper() {}
@@ -41,7 +43,7 @@ public class ProjectMapper {
                 .approvedBudget(projectDto.getApprovedBudget())
                 .revisedStartDate(projectDto.getRevisedStartDate())
                 .revisedEndDate(projectDto.getRevisedEndDate())
-                .revisedBudget(projectDto.getRevisedBudget())
+                .revisedBudget(sanitizeRevisedBudget(projectDto.getRevisedBudget()))
                 .priority(projectDto.getPriority())
                 .status(projectDto.getStatus())
                 .images(projectDto.getImages())
@@ -50,27 +52,35 @@ public class ProjectMapper {
 
     public static void updateProject(Project existing, ProjectDto projectDto, Ministry ministry, Directorate directorate) {
         if (projectDto == null) return;
+
         existing.setProjectName(projectDto.getProjectName());
         existing.setMinistry(ministry);
         existing.setDirectorate(directorate);
         existing.setApprovedStartDate(projectDto.getApprovedStartDate());
         existing.setApprovedEndDate(projectDto.getApprovedEndDate());
         existing.setApprovedBudget(projectDto.getApprovedBudget());
-        // Only update revised fields if explicitly provided in the DTO. This prevents
-        // accidental clearing of existing revised values when the client omits them.
-        if (projectDto.getRevisedStartDate() != null) {
-            existing.setRevisedStartDate(projectDto.getRevisedStartDate());
-        }
-        if (projectDto.getRevisedEndDate() != null) {
-            existing.setRevisedEndDate(projectDto.getRevisedEndDate());
-        }
-        if (projectDto.getRevisedBudget() != null) {
-            existing.setRevisedBudget(projectDto.getRevisedBudget());
-        }
+
+        // FIX: Directly assign revised dates so null values overwrite and clear old values in DB
+        existing.setRevisedStartDate(projectDto.getRevisedStartDate());
+        existing.setRevisedEndDate(projectDto.getRevisedEndDate());
+
+        // FIX: Sanitize budget so 0 or null cleanly persists as null in DB
+        existing.setRevisedBudget(sanitizeRevisedBudget(projectDto.getRevisedBudget()));
+
         existing.setPriority(projectDto.getPriority());
         existing.setStatus(projectDto.getStatus());
         if (projectDto.getImages() != null) {
             existing.setImages(projectDto.getImages());
         }
+    }
+
+    /**
+     * Converts null or values <= 0 into null for database consistency.
+     */
+    private static BigDecimal sanitizeRevisedBudget(BigDecimal budget) {
+        if (budget == null || budget.compareTo(BigDecimal.ZERO) <= 0) {
+            return null;
+        }
+        return budget;
     }
 }
