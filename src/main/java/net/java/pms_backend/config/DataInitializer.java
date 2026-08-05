@@ -19,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final RoleAccessHierarchyRepository roleAccessHierarchyRepository;
+    private final DevelopmentPartnerRepository developmentPartnerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -27,11 +28,11 @@ public class DataInitializer implements CommandLineRunner {
         seedRoles();
         seedRoleAccessHierarchies();
         seedAdminUser();
+        seedDevelopmentPartners();
     }
 
     private void seedMinistries() {
         List<String> defaultMinistries = Arrays.asList(
-
                 "President's Office",
                 "Prime Minister's Office",
                 "Cabinet Division",
@@ -247,6 +248,23 @@ public class DataInitializer implements CommandLineRunner {
             adminUser.setPasscode(passcode);
 
             userRepository.save(adminUser);
+        }
+    }
+
+    private void seedDevelopmentPartners() {
+        List<String> defaultPartners = Arrays.asList(
+                "World Bank (WB)",
+                "Asian Development Bank (ADB)",
+                "Japan International Cooperation Agency (JICA)"
+        );
+
+        for (String partnerName : defaultPartners) {
+            if (!developmentPartnerRepository.existsByDevPartnerName(partnerName)) {
+                DevelopmentPartner partner = DevelopmentPartner.builder()
+                        .devPartnerName(partnerName)
+                        .build();
+                developmentPartnerRepository.save(partner);
+            }
         }
     }
 }
