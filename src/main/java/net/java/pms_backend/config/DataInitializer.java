@@ -253,6 +253,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seedDevelopmentPartners() {
         List<String> defaultPartners = Arrays.asList(
+                "Government of Bangladesh (GOB)",
                 "World Bank (WB)",
                 "Asian Development Bank (ADB)",
                 "Japan International Cooperation Agency (JICA)"
