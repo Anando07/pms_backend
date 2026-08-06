@@ -113,6 +113,61 @@ public class PhysicalProgressServiceImpl implements PhysicalProgressService {
 
     @Override
     @Transactional
+    public ProjectWorkParameterDto updateProjectWorkParameter(Long parameterId, ProjectWorkParameterDto dto) {
+        ProjectWorkParameter existing = projectWorkParameterRepository.findById(parameterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Work Parameter not found with ID: " + parameterId));
+
+        Long projectId = existing.getProject().getId();
+
+        // 1. Fetch all existing parameters for this project to check cumulative weightage
+        List<ProjectWorkParameter> projectParameters = projectWorkParameterRepository.findByProjectId(projectId);
+
+        // 2. Calculate the projected total weightage after this update
+        BigDecimal totalWeightage = BigDecimal.ZERO;
+        for (ProjectWorkParameter param : projectParameters) {
+            if (param.getId().equals(parameterId)) {
+                totalWeightage = totalWeightage.add(dto.getWeightagePercentage());
+            } else {
+                totalWeightage = totalWeightage.add(param.getWeightagePercentage());
+            }
+        }
+
+        // 3. Ensure the total sum equals exactly 100.00%
+        if (totalWeightage.compareTo(new BigDecimal("100.00")) != 0) {
+            throw new IllegalArgumentException("Total target parameter weightage must sum to exactly 100%. Current sum would be: " + totalWeightage + "%");
+        }
+
+        // 4. Update and save
+        existing.setParameterName(dto.getParameterName().trim());
+        existing.setWeightagePercentage(dto.getWeightagePercentage());
+
+        ProjectWorkParameter updated = projectWorkParameterRepository.save(existing);
+
+        ProjectWorkParameterDto responseDto = PhysicalProgressMapper.mapParameterToDto(updated);
+        BigDecimal alreadyDone = physicalProgressRepository.getTotalLoggedByParameterId(updated.getId());
+        responseDto.setAlreadyCompletedPercentage(alreadyDone != null ? alreadyDone : BigDecimal.ZERO);
+
+        return responseDto;
+    }
+
+    @Override
+    @Transactional
+    public void deleteProjectWorkParameter(Long parameterId) {
+        ProjectWorkParameter paramToDelete = projectWorkParameterRepository.findById(parameterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Work Parameter not found with ID: " + parameterId));
+
+        BigDecimal loggedTotal = physicalProgressRepository.getTotalLoggedByParameterId(parameterId);
+        if (loggedTotal != null && loggedTotal.compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Cannot remove parameter '%s' because physical progress (%s%%) has already been logged against it.",
+                    paramToDelete.getParameterName(), loggedTotal));
+        }
+
+        projectWorkParameterRepository.delete(paramToDelete);
+    }
+
+    @Override
+    @Transactional
     public PhysicalProgressDto createProgress(PhysicalProgressDto dto) {
         Project project = projectRepository.findById(dto.getProjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with ID: " + dto.getProjectId()));

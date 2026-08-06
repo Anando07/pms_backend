@@ -21,12 +21,14 @@ public class ProjectWorkParameterDto {
 
     private Long id;
 
+    private Long projectId;
+
     @NotBlank(message = "Parameter name is required")
     private String parameterName;
 
     @NotNull(message = "Weightage percentage is required")
-    @DecimalMin(value = "0.01", message = "Weightage must be greater than 0")
-    @DecimalMax(value = "100.00", message = "Weightage cannot exceed 100%")
+    @DecimalMin(value = "0.01", message = "Weightage percentage must be greater than 0")
+    @DecimalMax(value = "100.00", message = "Weightage percentage cannot exceed 100")
     private BigDecimal weightagePercentage;
 
     private BigDecimal alreadyCompletedPercentage;

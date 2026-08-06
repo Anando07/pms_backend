@@ -32,6 +32,19 @@ public class PhysicalProgressController {
         return ResponseEntity.ok(physicalProgressService.getProjectWorkParameters(projectId));
     }
 
+    @PutMapping("/project/parameters/{parameterId}")
+    public ResponseEntity<ProjectWorkParameterDto> updateProjectParameter(
+            @PathVariable Long parameterId,
+            @Valid @RequestBody ProjectWorkParameterDto dto) {
+        return ResponseEntity.ok(physicalProgressService.updateProjectWorkParameter(parameterId, dto));
+    }
+
+    @DeleteMapping("/project/parameters/{parameterId}")
+    public ResponseEntity<String> deleteProjectParameter(@PathVariable Long parameterId) {
+        physicalProgressService.deleteProjectWorkParameter(parameterId);
+        return ResponseEntity.ok("Project work parameter deleted successfully.");
+    }
+
     // Stage 2: Progress Logging CRUD
     @PostMapping
     public ResponseEntity<PhysicalProgressDto> createProgress(@Valid @RequestBody PhysicalProgressDto dto) {
